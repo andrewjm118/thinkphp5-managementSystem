@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加角色</title>
+</head>
+<body>
+<div class="admin-main">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-verify="required" value="{$auth_result.title}" placeholder="请色名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">角色描述</label>
+            <div class="layui-input-block">
+                <textarea name="desc" placeholder="请输入角色描述" class="layui-textarea">{$auth_result.desc}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+
+                <input type="checkbox" name="status" {if condition="$auth_result.status eq 1"}checked {else /}{/if} lay-skin="switch">
+            </div>
+        </div>
+        <input type="hidden" value="{$auth_result.id}" name="id">
+        <button lay-filter="edit-role" lay-submit style="display: none;"></button>
+    </form>
+</div>
+</body>
+</html>

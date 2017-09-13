@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生列表</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+
+			<blockquote class="layui-elem-quote">
+				<a class="layui-btn layui-btn-small" href="{:url('clsadd')}">
+					<i class="layui-icon">&#xe608;</i> 添加课程
+				</a>
+
+				<a href="#" class="layui-btn layui-btn-small">
+					<i class="fa fa-shopping-cart" aria-hidden="true"></i> 导出信息
+				</a>
+
+				<a href="javascript:;" class="layui-btn layui-btn-small" id="search">
+					<i class="layui-icon">&#xe615;</i> 搜索
+				</a>
+			</blockquote>
+			
+			<fieldset class="layui-elem-field">
+				<legend>数据列表</legend>
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width: 30px;"><input type="checkbox" lay-filter="allselector" lay-skin="primary"></th>
+								<th>课程类型</th>
+								<th>年级</th>
+								<th>价格</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width: 30px;"><input type="checkbox" lay-skin="primary"></td>
+								<td>{$list.cname}</td>
+								<td>{$list.clevel}</td>
+								<td>{$list.cprice}</td>
+								<td>
+									<a data-opt="clsedit" data-url="{:url('Cls/clsedit','cid='.$list['cid'])}" href="javascript:;" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+									<!-- <a href="javascript:;" class="layui-btn layui-btn-warm layui-btn-mini">交费</a> -->
+									<a href="javascript:;" data-id="{$list.cid}" data-title="{$list.cname}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.use(['jquery','layer'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			layer = layui.layer;
+   
+        //ajax删除
+		$('a[data-opt=del]').click(function(){
+			var cid = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Cls/clsdel")}',{'cid':cid},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.reload();//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		$('a[data-opt=clsedit]').on('click', function () {
+            var url =$(this).data('url');
+            parent.tab.tabAdd({
+                href:url,
+                title:'编辑课程'
+            });
+        });
+    });
+</script>
+</html>

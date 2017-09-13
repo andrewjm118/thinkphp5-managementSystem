@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加错题</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="__CSS__/webuploader.css?v=0.1.5">
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-input-inline">
+						<select name="etstu" lay-verify="required" lay-filter="aihao">
+							<option value="">选项</option>
+							{volist name="stulist" id="list"}
+							<option value="{$list.stuname}">{$list.stuname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">年级</label>
+					<div class="layui-input-inline">
+						<select name="nianji" lay-verify="required" lay-filter="aihao">
+							<option value="">选项</option>
+							{volist name="errorlist" id="list"}
+							<option value="{$list.type_val}">{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">科目</label>
+					<div class="layui-input-inline">
+						<select name="subject_id" lay-verify="required" lay-filter="aihao">
+							<option value="">选项</option>
+							{volist name="subject" id="list"}
+							<option value="{$list.type_val}">{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">题目</label>
+					<div class="layui-input-inline">
+						<input type="text" name="ettitle" lay-verify="ettitle" autocomplete="off" placeholder="题目" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">时间</label>
+					<div class="layui-input-inline">
+						<input type="text" name="ettime" id="ettime" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">解答老师</label>
+					<div class="layui-input-inline">
+						<select name="etteacher" lay-verify="required" lay-filter="aihao">
+							<option value="">选项</option>
+							{volist name="tchlist" id="list"}
+							<option value="{$list.tname}">{$list.tname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">上传图片</label>
+				<div class="layui-input-block">
+					<div id="uploader-demo">
+						<!--用来存放item-->
+						<div id="thelist" class="uploader-list"></div>
+						<div>
+							<div id="filePicker">选择图片</div>
+							<button id="ctlBtn" class="btn btn-default">开始上传</button>
+						</div>
+					</div>
+				</div>
+
+			</div>
+	
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">解答</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide"  name="etnote" lay-verify="content"  id="LAY_demo_editor"></textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+
+<script>
+    layui.config({
+        base: '/static/js/',
+    }).extend({
+        webuploader: 'lib/webuploader'
+    });
+	layui.use(['form', 'layedit', 'laydate','element','webuploader'], function() {
+		var form = layui.form(),
+			layer = layui.layer,
+			$ = layui.jquery,
+			layedit = layui.layedit,
+            element = layui.element(),
+            layerTips = parent.layer === undefined ? layui.layer : parent.layer, //获取父窗口的layer对象
+            WebUploader = layui.webuploader(),
+			laydate = layui.laydate;
+			layedit.set({
+			  uploadImage: {
+			    url: '{:url("Error/uploads")}' //接口url
+			    ,type: '' //默认post
+			  }
+			});
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+		//自定义验证规则
+		form.verify({
+            ettitle: function(value) {
+				if(value.length < 5) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			pass: [/(.+){6,12}$/, '密码必须6到12位'],
+			content: function(value) {
+                    layedit.sync(editIndex);
+			}
+		});
+
+
+
+
+        $(function(){
+			/*init webuploader*/
+            var $list=$("#thelist");   //这几个初始化全局的百度文档上没说明，好蛋疼。
+            var $btn =$("#ctlBtn");   //开始上传
+            var thumbnailWidth = 100;   //缩略图高度和宽度 （单位是像素），当宽高度是0~1的时候，是按照百分比计算，具体可以看api文档
+            var thumbnailHeight = 100;
+
+            var uploader = WebUploader.create({
+                // 选完文件后，是否自动上传。
+                auto: true,
+
+                // swf文件路径
+                swf: '/webupload/Uploader.swf',
+
+                // 文件接收服务端。
+                server: '{:url("Error/uploads")}',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: '#filePicker',
+
+                // 只允许选择图片文件。
+                accept: {
+                    title: 'Images',
+                    extensions: 'gif,jpg,jpeg,bmp,png',
+                    mimeTypes: 'image/*'
+                },
+            });
+            // 当有文件添加进来的时候
+            uploader.on( 'fileQueued', function( file ) {  // webuploader事件.当选择文件后，文件被加载到文件队列中，触发该事件。等效于 uploader.onFileueued = function(file){...} ，类似js的事件定义。
+                var $li = $(
+                        '<div id="' + file.id + '" class="file-item thumbnail">' +
+                        '<img>' +
+                        '<div class="info">' + file.name + '</div>' +
+                        '</div>'
+                    ),
+                    $img = $li.find('img');
+
+
+                // $list为容器jQuery实例
+                $list.append( $li );
+
+                // 创建缩略图
+                // 如果为非图片文件，可以不用调用此方法。
+                // thumbnailWidth x thumbnailHeight 为 100 x 100
+                uploader.makeThumb( file, function( error, src ) {   //webuploader方法
+                    if ( error ) {
+                        $img.replaceWith('<span>不能预览</span>');
+                        return;
+                    }
+
+                    $img.attr( 'src', src );
+                }, thumbnailWidth, thumbnailHeight );
+            });
+            // 文件上传过程中创建进度条实时显示。
+            uploader.on( 'uploadProgress', function( file, percentage ) {
+                var $li = $( '#'+file.id ),
+                    $percent = $li.find('.progress span');
+
+                // 避免重复创建
+                if ( !$percent.length ) {
+                    $percent = $('<p class="progress"><span></span></p>')
+                        .appendTo( $li )
+                        .find('span');
+                }
+
+                $percent.css( 'width', percentage * 100 + '%' );
+            });
+
+            // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+            uploader.on( 'uploadSuccess', function( file ) {
+                $( '#'+file.id ).addClass('upload-state-done');
+            });
+
+            // 文件上传失败，显示上传出错。
+            uploader.on( 'uploadError', function( file ) {
+                var $li = $( '#'+file.id ),
+                    $error = $li.find('div.error');
+
+                // 避免重复创建
+                if ( !$error.length ) {
+                    $error = $('<div class="error"></div>').appendTo( $li );
+                }
+
+                $error.text('上传失败');
+            });
+
+            // 完成上传完了，成功或者失败，先删除进度条。
+            uploader.on( 'uploadComplete', function( file ) {
+                $( '#'+file.id ).find('.progress').remove();
+            });
+            $btn.on( 'click', function() {
+                console.log("上传...");
+                uploader.upload();
+                console.log("上传成功");
+            });
+        });
+
+
+
+
+
+
+
+
+        //监听提交
+		form.on('submit(demo1)', function(data) {
+			var param = data.field;
+            //调试表单
+			/*layerTips.open({
+			 title: '这里面是表单的信息',
+			 type: 1,
+			 content: JSON.stringify(data.field),
+			 area: ['500px', '300px'],
+			 btn: ['关闭并刷新', '关闭'],
+			 yes: function(index, layero) {
+			 layerTips.msg('你点击了关闭并刷新');
+			 layerTips.close(index);
+			 location.reload(); //刷新
+			 }
+			 });*/
+			$.ajax({
+                type: "POST",
+                url: "{:url('Error/erroradd')}",
+                data: param,
+                dataType: 'json',
+                success: function (data) {
+                	if(data.code == 200){
+                        layerTips.msg(data.msg, {icon: 1, time: 1000}, function(){
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                            parent.location.reload();//刷新
+					    });
+					  }else{
+                        layerTips.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+					  }
+                }
+            });
+			return false;
+		});
+
+	});
+	
+	
+</script>
+
+</html>

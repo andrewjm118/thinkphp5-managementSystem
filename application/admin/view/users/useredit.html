@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑人员</title>
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">角色</label>
+					<div class="layui-input-inline">
+						<select name="rule_id" lay-verify="required" lay-filter="rule_id">
+							<option value=""></option>
+							{volist name="authlist" id="list"}
+							<option value="{$list.id}|{$list.title}" {if condition="$userdetail.rule_id eq $list.id"}selected="selected"{/if}>{$list.title}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div id="nis" class="layui-form-item" {if condition="$userdetail.teacher_id"}style="display: none;"{/if}>
+				<div class="layui-inline">
+					<label class="layui-form-label">昵称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="nick" value="{$userdetail.nick}" id="nick" placeholder="昵称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div id="tea" class="layui-form-item" {if condition="$userdetail.teacher_id eq ''"}style="display: none;"{/if}>
+				<div class="layui-inline">
+					<label class="layui-form-label">老师</label>
+					<div class="layui-input-inline">
+						<select name="teacher_id" lay-filter="teacher_id">
+							<option value=""></option>
+							{volist name="tchlist" id="list"}
+							<option value="{$list.tid}|{$list.tname}" {if condition="$userdetail.teacher_id eq $list.tid"}selected="selected"{/if}>{$list.tname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div id="stus" class="layui-form-item" {if condition="$userdetail.teacher_id eq ''"}style="display: none;"{/if}>
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-inline">
+						{volist name="stulist" id="list" mod="5"}
+							<input type="checkbox" name="stus[{$list.stuid}]" value="{$list.stuid}" title="{$list.stuname}" lay-skin="primary" lay-filter="stux" {in name="$list.stuid" value="$userdetail.stus"}checked{/in}> 
+							{eq name="mod" value="4"}<br/>{/eq}
+						{/volist}
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">手机号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="mobile" value="{$userdetail.mobile}" id="mobile" lay-verify="phone" placeholder="手机号" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="pass" lay-verify="password" autocomplete="off" placeholder="密码" class="layui-input">
+					</div>
+					<div class="layui-form-mid layui-word-aux">为空则不修改</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">确认密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="repass" lay-verify="password" autocomplete="off" placeholder="确认密码" class="layui-input">
+					</div>
+					<div class="layui-form-mid layui-word-aux">为空则不验证</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+		            <label class="layui-form-label">状态</label>
+		            <div class="layui-input-block">
+		                <input type="checkbox" name="lock" {if condition="$userdetail.lock eq 1"}checked{/if}  lay-skin="switch">
+		            </div>
+		        </div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="uid" value="{$userdetail.uid}">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="useredits">立即提交</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+
+
+</html>

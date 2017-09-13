@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+</head>
+<body>
+<div class="admin-main">
+
+    <blockquote class="layui-elem-quote">
+        <a href="javascript:;" class="layui-btn layui-btn-small" id="add">
+            <i class="layui-icon">&#xe608;</i> 添加角色
+        </a>
+
+    </blockquote>
+
+
+
+        <div class="layui-form layui-form-pane search-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">标题</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="search[title]" id="search_val" value="" lay-verify="" placeholder="请输入标题搜索" autocomplete="off" class="layui-input">
+                </div>
+                <button class="layui-btn" id="search" lay-submit="" lay-filter="">搜索</button>
+            </div>
+            <!-- 每页数据量 -->
+            <div class="layui-form-item page-size">
+                <label class="layui-form-label total">共计 {$count} 条</label>
+                <label class="layui-form-label">每页数据条</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="page_size" value="15" id="tiaoshu_num" lay-verify="number" placeholder="" autocomplete="off" class="layui-input">
+                </div>
+                <button class="layui-btn" id="tiaoshu" lay-submit="" lay-filter="">确定</button>
+            </div>
+        </div>
+
+        <div class="layui-form">
+            <table class="layui-table list-table">
+                <thead>
+                <tr>
+                    <th style="width: 30px;"><input type="checkbox" lay-filter="allselector" lay-skin="primary"></th>
+                    <th>角色名称</th>
+                    <th>角色描述</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="content">
+                {volist name="result" id="vo"}
+                <tr>
+                    <td><input type="checkbox" lay-skin="primary"></td>
+                    <td>{$vo.title}</td>
+                    <td>{$vo.desc}</td>
+                    <td>
+                        {if condition="$vo.status eq 1"}启用
+                        {else /} 停用
+                        {/if}
+
+                    </td>
+
+                    <td>
+                        <!--<a data-opt="set_role" data-title="{$vo.title}" data-url="{:url('setRole',['id'=>$vo.id])}" href="javascript:;" data-id="{$vo.id}" class="layui-btn layui-btn-normal layui-btn-mini">权限设置</a> -->
+                        <a  data-params='{"content": "{:url('setRole',['id'=>$vo.id])}", "title": "权限设置","full":"true"}'  class="layui-btn layui-btn-normal layui-btn-mini modal-iframe">权限设置</a>
+                        <a href="javascript:;" data-id="{$vo.id}" data-opt="edit" class="layui-btn layui-btn-mini">编辑</a>
+                        <a href="javascript:;" data-id="{$vo.id}" data-title="{$vo.title}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+                    </td>
+                </tr>
+                {/volist}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th><button class="layui-btn layui-btn-small" lay-submit="" lay-filter="delete">删除</button></th>
+                    <th colspan="4"><div id="page"></div></th>
+                </tr>
+
+                </tfoot>
+            </table>
+        </div>
+
+
+
+</div>
+<!--模板-->
+<script type="text/html" id="tpl">
+    {{# layui.each(d.list, function(index, item){ }}
+    <tr>
+        <td><input type="checkbox" lay-skin="primary"></td>
+        <td>{{ item.title }}</td>
+        <td>{{ item.desc }}</td>
+        <td>
+            {{# if (item.status == 1) { }}
+            启用
+            {{# } else { }}
+            停用
+            {{# } }}
+
+        </td>
+
+
+        <td>
+            <a data-params='{"content": "{:url('setRole',['id'=>$vo.id])}", "title": "权限设置","full":"true"}'  class="layui-btn layui-btn-normal layui-btn-mini modal-iframe">权限设置</a>
+            <a href="javascript:;" data-id="{{ item.id }}" data-opt="edit" class="layui-btn layui-btn-mini">编辑</a>
+            <a href="javascript:;" data-id="{{ item.id }}" data-title="{{ item.title }}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+        </td>
+    </tr>
+    {{# }); }}
+</script>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+
+<script type="text/javascript">
+    layui.config({
+        base: '/static/js/',
+    }).extend({
+        modal: 'modal'
+    });
+    layui.use(['laypage', 'layer','form','laytpl','modal'], function() {
+        var laypage = layui.laypage
+            , layer = layui.layer
+            , $ = layui.jquery
+            , modal = layui.modal
+            , layerTips = parent.layer === undefined ? layui.layer : parent.layer //获取父窗口的layer对象
+            , form = layui.form()
+            , laytpl = layui.laytpl;
+        var baseSize = 15; //初始分页大小
+        //初始化
+        modal.init();
+        //开启分页
+        fenye(baseSize);
+
+        xuanran();
+
+        function fenye(pageSize, keyword) {
+            var pageSize = pageSize;   //每页显示条数
+            var pages = 0;
+            //默认分页数
+            if (!keyword && pageSize == baseSize) {
+                pages = {$count} % pageSize == 0 ? ({$count} / pageSize) : Math.ceil({$count} / pageSize);  //获取总页数
+                //调用分页
+
+                laypage({
+                    cont: 'page'   //分页容器
+                    , pages: pages //得到总页数
+                    , jump: function (obj, first) {
+                        //得到了当前页，用于向服务端请求对应数据
+                        var curr = obj.curr;
+                        if (!first) {
+                            var jiazai = layer.load(2);
+                            $.ajax({
+                                type: "GET",
+                                url: "{:url('roleList')}",
+                                data: {pageIndex: curr, pageSize: pageSize},
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.rel == true) {
+                                        var tpl = $('#tpl').html();
+                                        laytpl(tpl).render(data, function (html) {
+                                            $('#content').empty();
+                                            $('#content').append(html);
+                                        });
+                                    } else {
+                                        layerTips.msg("获取信息失败");
+                                    }
+                                    layer.close(jiazai);
+
+                                }
+
+                            });
+                        }
+                    }
+                });
+            } else {
+                //设置分页数
+                if (!keyword && pageSize != baseSize) {
+                    var parms = {pageCount: pageSize};
+                } else {
+                    var parms = {keyword: keyword, pageCount: pageSize};
+                }
+
+                var count = 0;
+                $.ajax({
+                    type: "GET",
+                    url: "{:url('roleList')}",
+                    data: parms,
+                    async: false,
+                    cache: false,
+                    success: function (data) {
+                        count = data.count;
+                        if (count == 0) {
+                            layerTips.msg("没有数据");
+                            //pages = {$count} % pageSize == 0 ? ({$count} / pageSize) : Math.ceil({$count} / pageSize);  //获取总页数
+                        } else {
+                            pages = count % pageSize == 0 ? (count / pageSize) : Math.ceil(count / pageSize);  //获取总页数
+                            var tpl = $('#tpl').html();
+                            laytpl(tpl).render(data, function (html) {
+                                $('#content').html(html);
+                            });
+                            xuanran();
+                            laypage({
+                                cont: 'page'   //分页容器
+                                , pages: pages //得到总页数
+                                , jump: function (obj, first) {
+                                    //得到了当前页，用于向服务端请求对应数据
+                                    var curr = obj.curr;
+                                    if (!first) {
+                                        var jiazai = layer.load(2);
+                                        $.ajax({
+                                            type: "GET",
+                                            url: "{:url('roleList')}",
+                                            data: {pageIndex: curr, pageSize: pageSize, keyword: keyword},
+                                            dataType: "json",
+                                            success: function (data) {
+                                                if (data.rel == true) {
+                                                    var tpl = $('#tpl').html();
+                                                    laytpl(tpl).render(data, function (html) {
+                                                        $('#content').html(html);
+                                                    });
+                                                } else {
+                                                    layerTips.msg("获取信息失败");
+                                                }
+                                                layer.close(jiazai);
+                                                xuanran();
+
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                });
+
+            }
+
+        }
+
+        //渲染与绑定
+        function xuanran(){
+            //渲染checkbox
+            form.render('checkbox');
+            //全选checkbox
+            form.on('checkbox(allselector)', function(data) {
+                var elem = data.elem;
+
+                $('#content').children('tr').each(function() {
+                    var $that = $(this);
+                    //全选或反选
+                    $that.children('td').eq(0).children('input[type=checkbox]')[0].checked = elem.checked;
+                    form.render('checkbox');
+                });
+            });
+
+            //绑定所有按钮事件
+            var editBoxIndex = -1;
+            $('#content').children('tr').each(function() {
+                var $that = $(this);
+                //编辑事件
+                $that.children('td:last-child').children('a[data-opt=edit]').on('click', function() {
+                    //layer.msg($(this).data('id'));
+                    if(editBoxIndex !== -1)
+                        return;
+                    var param = {
+                        id: $(this).data('id')
+                    };
+                    var index = layer.msg('编辑载入中', {
+                        icon: 16
+                        ,shade: 0.01
+                    });
+                    $.get("{:url('editRole')}", param, function(form) {
+                        layer.close(index);
+                        editBoxIndex = layer.open({
+                            type: 1,
+                            title: '编辑角色',
+                            content: form,
+                            btn: ['保存', '取消'],
+                            shade: false,
+                            offset: ['100px', '30%'],
+                            area: ['600px', '400px'],
+                            zIndex: 10000,
+                            maxmin: true,
+                            yes: function(index) {
+                                //触发表单的提交事件
+                                $('form.layui-form').find('button[lay-filter=edit-role]').click();
+                            },
+                            full: function(elem) {
+                                var win = window.top === window.self ? window : parent.window;
+                                $(win).on('resize', function() {
+                                    var $this = $(this);
+                                    elem.width($this.width()).height($this.height()).css({
+                                        top: 0,
+                                        left: 0
+                                    });
+                                    elem.children('div.layui-layer-content').height($this.height() - 95);
+                                });
+                            },
+                            success: function(layero, index) {
+                                //弹出窗口成功后渲染表单
+                                var form = layui.form();
+                                form.render();
+                                form.on('submit(edit-role)', function(data) {
+                                    console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+                                    console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+                                    console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+                                    //调试表单
+                                    /*layerTips.open({
+                                     title: '这里面是表单的信息',
+                                     type: 1,
+                                     content: JSON.stringify(data.field),
+                                     area: ['500px', '300px'],
+                                     btn: ['关闭并刷新', '关闭'],
+                                     yes: function(index, layero) {
+                                     layerTips.msg('你点击了关闭并刷新');
+                                     layerTips.close(index);
+                                     location.reload(); //刷新
+                                     }
+
+                                     })*/;
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "{:url('editRole')}",
+                                        async: false,
+                                        data: {id:data.field.id,title:data.field.title, desc:data.field.desc,status:data.field.status},
+                                        dataType: "json",
+                                        success: function(data){
+                                            if(data.code == 200){
+                                                layer.close(index);
+                                                layerTips.msg("编辑成功", {icon: 1, time: 1000}, function(){
+                                                    location.reload();//刷新
+                                                });
+
+                                            }else{
+                                                layerTips.msg("编辑失败");
+                                            }
+
+                                        }
+                                    });
+                                    return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                                });
+                                //console.log(layero, index);
+                            },
+                            end: function() {
+                                editBoxIndex = -1;
+                            }
+                        });
+                    });
+
+                });
+                //删除事件
+                $that.children('td:last-child').children('a[data-opt=del]').on('click', function(){
+                    var id = $(this).data('id');
+                    layer.confirm('确定删除【'+$(this).data('title')+'】?', function(index){
+                        loading = layer.load(2, {
+                            shade: [0.2,'#000'] //0.2透明度的白色背景
+                        });
+                        $.post('{:url("roleDel")}',{'id':id},function(data){
+                            if(data.code == 200){
+                                layer.close(loading);
+                                layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+                                    location.reload();//do something
+                                });
+                            }else{
+                                layer.close(loading);
+                                layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        //获取所有选择的列
+        $('#getSelected').on('click', function () {
+            var names = '';
+            $('#content').children('tr').each(function () {
+                var $that = $(this);
+                var $cbx = $that.children('td').eq(0).children('input[type=checkbox]')[0].checked;
+                if ($cbx) {
+                    var n = $that.children('td:last-child').children('a[data-opt=edit]').data('name');
+                    names += n + ',';
+                }
+            });
+            layer.msg('你选择的名称有：' + names);
+        });
+
+
+        //添加角色
+        var addBoxIndex = -1;
+        $('#add').on('click', function () {
+            if (addBoxIndex !== -1)
+                return;
+            //本表单通过ajax加载 --以模板的形式，当然你也可以直接写在页面上读取
+            $.get("{:url('addRole')}", null, function (form) {
+                addBoxIndex = layer.open({
+                    type: 1,
+                    title: '添加角色',
+                    content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    offset: ['100px', '30%'],
+                    area: ['600px', '400px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=add-role]').click();
+                    },
+                    full: function (elem) {
+                        var win = window.top === window.self ? window : parent.window;
+                        $(win).on('resize', function () {
+                            var $this = $(this);
+                            elem.width($this.width()).height($this.height()).css({
+                                top: 0,
+                                left: 0
+                            });
+                            elem.children('div.layui-layer-content').height($this.height() - 95);
+                        });
+                    },
+                    success: function (layero, index) {
+                        //弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        form.on('submit(add-role)', function (data) {
+                            console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
+                            console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
+                            console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
+                            //调试表单
+                            /* layerTips.open({
+                             title: '这里面是表单的信息',
+                             type: 1,
+                             content: JSON.stringify(data.field),
+                             area: ['500px', '300px'],
+                             btn: ['关闭并刷新', '关闭'],
+                             yes: function(index, layero) {
+                             layerTips.msg('你点击了关闭并刷新');
+                             layerTips.close(index);
+                             location.reload(); //刷新
+                             }
+
+                             });*/
+                            $.ajax({
+                                type: "POST",
+                                url: "{:url('addRole')}",
+                                data: {title: data.field.title, desc: data.field.desc, status: data.field.status},
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.code == 200) {
+                                       // layerTips.msg('添加成功');
+                                        layer.close(index);
+                                        layerTips.msg("添加成功", {icon: 1, time: 1000}, function(){
+                                            location.reload();//刷新
+                                        });
+
+                                    } else {
+                                        layerTips.msg("添加失败");
+                                    }
+
+                                }
+                            });
+                            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                        });
+                        //console.log(layero, index);
+                    },
+                    end: function () {
+                        addBoxIndex = -1;
+                    }
+                });
+            });
+        });
+
+
+        //搜索关键词
+        $('#search').on('click', function () {
+            var keyword = $('#search_val').val();
+            if (!keyword) {
+                location.href = "{:url('rolemanage')}";
+            } else {
+                fenye(baseSize, keyword);
+            }
+        });
+
+
+
+        //获取每页显示条数
+        $('#tiaoshu').on('click', function () {
+            var num = $('#tiaoshu_num').val();
+            fenye(num);
+        });
+
+
+        $('a[data-opt=set_role]').on('click', function () {
+            var url =$(this).data('url');
+            var title =$(this).data('title');
+            parent.tab.tabAdd({
+                href:url,
+                title:'设置'+title+'权限'
+            });
+        });
+
+    });
+
+
+
+</script>
+
+</body>
+</html>

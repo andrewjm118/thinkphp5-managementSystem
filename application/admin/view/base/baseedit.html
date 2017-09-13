@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加基础数据</title>
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">数据类型</label>
+					<div class="layui-input-inline">
+						<select name="type_id" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="leixing" id="list"}
+							<option value="{$list.ti_id}" {if condition="$basedetail.ti_id eq $list.ti_id"}selected="selected"{/if}>{$list.type_name}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">数据名称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="type_val" value="{$basedetail.type_val}" lay-verify="title" autocomplete="off" placeholder="价格" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="tv_id" value="{$basedetail.tv_id}">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="baseedits">立即提交</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

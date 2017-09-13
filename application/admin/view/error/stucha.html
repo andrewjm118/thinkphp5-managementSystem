@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑错题</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="__CSS__/webuploader.css?v=0.1.5">
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-input-inline">
+
+						<input type="text" name="" value="{$errordetail.etstu}"  class="layui-input" readonly>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">年级</label>
+					<div class="layui-input-inline">
+						<input type="text" name="" value="{$errordetail.nianji}"  class="layui-input" readonly>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">科目:</label>
+					<div class="layui-input-inline">
+						<input type="text" name="" value="{$errordetail.subject_id}"  class="layui-input" readonly>
+
+					</div>
+
+				</div>
+				
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">题目</label>
+					<div class="layui-input-inline">
+						<input type="text" name="" value="{$errordetail.ettitle}"  class="layui-input" readonly>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">时间</label>
+					<div class="layui-input-inline">
+						<input type="text" name="" value="{$errordetail.ettime}"  class="layui-input" readonly>
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">图片</label>
+				<div class="layui-input-block">
+
+
+					<div id="uploader" class="wu-example">
+						<div class="queueList filled">
+							<ul class="filelist">
+								{volist name="tu" id="tulist"}
+								<li id="63"><p class="title"></p><p class="imgWrap"><img src="{$tulist.tu_url}" layer-pid="{$tulist.tu_id}" layer-src="{$tulist.tu_url}"  width="110"  height="146" layer-index="0"></p><p class="progress"><span></span></p><span class="success"></span></li>
+
+								{/volist}
+							</ul>
+
+						</div>
+
+					</div>
+
+
+
+
+				</div>
+
+			</div>
+	
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">解答</label>
+				<div class="layui-input-block">
+					<textarea name=""  lay-verify="" class="layui-textarea">{$errordetail.etnote}</textarea>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+	<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+	<script>
+        layui.use(['form'], function() {
+            var $ = layui.jquery;
+
+
+            //图片放大
+            $('#uploader .imgWrap img').on('click', function() {
+                layer.photos({
+                    photos: '.imgWrap'
+                    ,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+                });
+            });
+
+        });
+	</script>
+</body>
+
+
+</html>

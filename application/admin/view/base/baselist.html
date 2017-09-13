@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>基础数据列表</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+
+			<blockquote class="layui-elem-quote">
+				<a class="layui-btn layui-btn-small" id="baseadd">
+					<i class="layui-icon">&#xe608;</i> 添加基础数据
+				</a>
+			</blockquote>
+			
+			<fieldset class="layui-elem-field">
+				<legend>数据列表</legend>
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width: 30px;"><input type="checkbox" lay-filter="allselector" lay-skin="primary"></th>
+								<th>类型</th>
+								<th>值</th>
+
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width: 30px;"><input type="checkbox" lay-skin="primary"></td>
+								<td>{$list.type_name}</td>
+								<td>{$list.type_val}</td>
+
+								<td>
+									<a href="javascript:;" data-opt="baseedit" data-id="{$list.tv_id}" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+									<a href="javascript:;" data-id="{$list.tv_id}" data-title="{$list.type_val}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.use(['jquery','layer','form'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			form = layui.form(), 
+			layer = layui.layer;
+   
+        //ajax删除
+		$('a[data-opt=del]').click(function(){
+			var tv_id = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Base/basedel")}',{'tv_id':tv_id},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.reload();//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		$('#baseadd').click(function(){
+			$.get("{:url('baseadd')}", {}, function(form){
+				layer.open({
+					type: 1,
+					title: '添加基础数据',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['600px', '400px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=baseadd]').click();
+                        //layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(baseadd)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('Base/baseadd')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('Base/baselist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+					},
+				});
+			});
+		});
+		$(document).on("click",'a[data-opt=baseedit]',function(){
+        	var param = {
+                tv_id: $(this).data('id')
+            };
+            var index = layer.msg('编辑载入中', {
+                icon: 16
+                ,shade: 0.01
+            });
+			$.get("{:url('baseedit')}", param, function(form){
+				layer.close(index);
+				layer.open({
+					type: 1,
+					title: '编辑基础数据',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['600px', '400px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=baseedits]').click();
+                        // layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(baseedits)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('Base/baseedit')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('Base/baselist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+					},
+				});
+			});
+		});
+    });
+</script>
+</html>

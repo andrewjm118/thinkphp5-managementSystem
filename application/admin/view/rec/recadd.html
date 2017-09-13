@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加上课信息</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-input-inline">
+						<select name="rstu" lay-verify="required" lay-filter="rstu">
+							<option value=""></option>
+							{volist name="stulist" id="list"}
+							<option value="{$list.stuname}|{$list.stuid}">{$list.stuname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">老师</label>
+					<div class="layui-input-inline">
+						<select name="rteacher" lay-verify="required" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="tchlist" id="list"}
+							<option value="{$list.tname}">{$list.tname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">课程</label>
+					<div class="layui-input-inline">
+						<select name="rcid" lay-verify="required" lay-filter="kecheng">
+							<option value=""></option>
+							{volist name="kecheng" id="list"}
+							<option value="{$list.cid}">{$list.cname} / {$list.subject} / {$list.clevel}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">课节</label>
+					<div class="layui-input-inline">
+						<input type="text" name="rclass" lay-verify="required"  placeholder="" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">上课时间</label>
+					<div class="layui-input-inline">
+					  <input type="text" class="layui-input" lay-verify="required" name="lessontime" placeholder="Y-m-d h:m:s" onclick="layui.laydate({elem: this, istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+					</div>
+				</div>
+				
+				<div class="layui-inline">
+					<label class="layui-form-label">费用</label>
+					<div class="layui-input-inline">
+						<input type="text" name="rprice" lay-verify="required"  placeholder="" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">实收</label>
+					<div class="layui-input-inline">
+						<input type="text" name="rincome" lay-verify="required"  placeholder="" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">记录人</label>
+					<div class="layui-input-inline">
+						<input type="text" name="recorder" lay-verify="required"  placeholder="" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="rnote" lay-verify="content" id="LAY_demo_editor"></textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit="" lay-filter="teacher">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+
+<script>
+	layui.use(['form', 'layedit', 'laydate'], function() {
+		var form = layui.form(),
+			layer = layui.layer,
+			$ = layui.jquery,
+			layedit = layui.layedit,
+			laydate = layui.laydate;
+			layedit.set({
+			  uploadImage: {
+			    url: '{:url("Rec/uploads")}' //接口url
+			    ,type: '' //默认post
+			  }
+			});
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+		//自定义验证规则
+		form.verify({
+			title: function(value) {
+				if(value.length < 1) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			pass: [/(.+){6,12}$/, '密码必须6到12位'],
+			content: function(value) {
+				layedit.sync(editIndex);
+			}
+		});
+
+		//监听提交
+		form.on('submit(teacher)', function(data) {
+			loading = layer.load(2, {
+		      shade: [0.2,'#000'] //0.2透明度的白色背景
+		    });
+			var param = data.field;
+			$.ajax({
+                type: "POST",
+                url: "{:url('Rec/recadd')}",
+                data: param,
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                	if(data.code == 200){
+                		layer.close(loading);
+					    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+                            //关闭tab窗口
+							/*var id  = parent.tab.getCurrentTabId();
+							 parent.tab.deleteTab(id);*/
+                            //关闭full窗口
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+					  }else{
+					  	layer.close(loading);
+					    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000},function(){
+					    	var id  = parent.tab.getCurrentTabId();
+                            parent.tab.deleteTab(id);
+					    });
+					  }
+                }
+            });
+			return false;
+		});
+		form.on('select(kecheng)', function(data){
+			var cid = data.value; //得到被选中的值
+			$.ajax({
+                type: "POST",
+                url: "{:url('Rec/getcou')}",
+                data: {'cid':cid},
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                	if(data.code == 200){
+					    $("input[name='rprice']").val(data.result.cprice);
+					  }else{
+					    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+					  }
+                }
+            });
+		}); 
+		form.on('select(rstu)', function(data){
+			var rstu = data.value;
+			$.ajax({
+                type: "POST",
+                url: "{:url('Rec/getyu')}",
+                data: {'rstu':rstu},
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                	if(data.code == 0){
+					    layer.msg(data.msg, {icon: 2, time: 1000});
+					}
+                }
+            });
+		});           
+	});
+</script>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑类型</title>
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">类型名称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="type_name" value="{$typedetail.type_name}" lay-verify="type_name" autocomplete="off" placeholder="价格" class="layui-input">
+					</div>
+				</div>
+			</div>
+			
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">类型描述</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="type_content" lay-verify="content" id="LAY_demo_editor">{$typedetail.type_content}</textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="ti_id" value="{$typedetail.ti_id}">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="typeedits">确认修改</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

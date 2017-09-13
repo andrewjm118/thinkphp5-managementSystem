@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑菜单</title>
+</head>
+<body>
+<div class="admin-main">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">权限名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-verify="required" value="{$auth_rule.title}" placeholder="请输入权限名称" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">权限规则</label>
+            <div class="layui-input-block">
+                <textarea name="name" placeholder="请输入权限规则" lay-verify="required" class="layui-textarea">{$auth_rule.name}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+
+                <input type="checkbox" name="status" {if condition="$auth_rule.status eq 1"}checked {else /}{/if} lay-skin="switch">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">菜单</label>
+            <div class="layui-input-block">
+
+                <input type="checkbox" name="menu" {if condition="$auth_rule.menu eq 1"}checked {else /}{/if} lay-skin="switch">
+            </div>
+        </div>
+        <input type="hidden" value="{$auth_rule.id}" name="id">
+        <input type="hidden" value="{$auth_rule.pid}" name="pid">
+        <button lay-filter="edit-menu" lay-submit style="display: none;"></button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>类型列表</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+
+			<blockquote class="layui-elem-quote">
+				<a href="javascript:;" class="layui-btn layui-btn-small" id="typeadd">
+					<i class="layui-icon">&#xe608;</i> 添加类型
+				</a>
+			
+			</blockquote>
+			
+			<fieldset class="layui-elem-field">
+				<legend>类型列表</legend>
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width: 30px;"><input type="checkbox" lay-filter="allselector" lay-skin="primary"></th>
+
+								<th>类型名称</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width: 30px;"><input type="checkbox" lay-skin="primary"></td>
+
+								<td>{$list.type_name}</td>
+								<td>
+									<a href="javascript:;" data-opt="typeedit" data-id="{$list.ti_id}" class="layui-btn layui-btn-normal layui-btn-mini">编辑</a>
+									<a href="javascript:;" data-id="{$list.ti_id}" data-title="{$list.type_name}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.use(['jquery','layer', 'layedit','form'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			form = layui.form(),
+			layer = layui.layer;
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+		//自定义验证规则
+		form.verify({
+			title: function(value) {
+				if(value.length < 5) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			pass: [/(.+){6,12}$/, '密码必须6到12位'],
+			content: function(value) {
+				layedit.sync(editIndex);
+			}
+		});
+   
+        //ajax删除
+		$('a[data-opt=del]').click(function(){
+			var ti_id = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Type/typedel")}',{'ti_id':ti_id},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.reload();//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		$(document).on("click",'a[data-opt=typeedit]',function(){
+        	var param = {
+                ti_id: $(this).data('id')
+            };
+            var index = layer.msg('编辑载入中', {
+                icon: 16
+                ,shade: 0.01
+            });
+			$.get("{:url('typeedit')}", param, function(form){
+				layer.close(index);
+				layer.open({
+					type: 1,
+					title: '编辑基础数据',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['800px', '500px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=typeedits]').click();
+                        // layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(typeedits)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('Type/typeedit')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('Type/typelist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+						//创建一个编辑器
+						var editIndex = layedit.build('LAY_demo_editor');
+						//自定义验证规则
+						form.verify({
+							title: function(value) {
+								if(value.length < 1) {
+									return '标题至少得1个字符啊';
+								}
+							},
+							pass: [/(.+){6,12}$/, '密码必须6到12位'],
+							content: function(value) {
+								layedit.sync(editIndex);
+							}
+						});
+					},
+				});
+			});
+		});
+		$('#typeadd').click(function(){
+			var index = layer.msg('添加载入中', {
+                icon: 16
+                ,shade: 0.01
+            });
+			$.get("{:url('typeadd')}", {}, function(form){
+				layer.close(index);
+				layer.open({
+					type: 1,
+					title: '添加类型',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['800px', '500px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=addtypes]').click();
+                        // layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(addtypes)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('typeadd')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('typelist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+						//创建一个编辑器
+						var editIndex = layedit.build('LAY_demo_editor');
+						//自定义验证规则
+						form.verify({
+							title: function(value) {
+								if(value.length < 1) {
+									return '标题至少得1个字符啊';
+								}
+							},
+							pass: [/(.+){6,12}$/, '密码必须6到12位'],
+							content: function(value) {
+								layedit.sync(editIndex);
+							}
+						});
+					},
+				});
+			});
+		});
+    });
+</script>
+</html>

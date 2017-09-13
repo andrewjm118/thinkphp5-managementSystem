@@ -1,0 +1,106 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+	<meta content="webkit" name="renderer" />
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>控制面板</title>
+	<link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+	<link rel="stylesheet" href="__CSS__/main.css" media="all">
+</head>
+<body>
+<div class="admin-main">
+	<div class="layui-collapse" lay-accordion lay-filter="collapse">
+		<div class="layui-colla-item">
+			<h2 class="layui-colla-title">系统信息</h2>
+			<div class="layui-colla-content layui-show">
+				<table class="layui-table">
+					<tr>
+						<td width="40%">系统名称</td>
+						<td width="60%">掬英学校管理系统</td>
+					</tr>
+					<tr>
+						<td>系统版本</td>
+						<td>v1.17061401</td>
+					</tr>
+
+				</table>
+			</div>
+		</div>
+		<div class="layui-colla-item">
+			<h2 class="layui-colla-title">更新日志</h2>
+			<div class="layui-colla-content">
+				<h2>版本：v1.17052701(已完成)</h2>
+				<p>1. 浏览器兼容问题,ie8及以下提示安装新的浏览器</p>
+				<p>2. 添加或者修改数据追加为空验证</p>
+				<p>3. 增加教师角色功能。</p>
+				<p>4. 弹出窗口提示问题z-index</p>
+				<p>5. 已知bug</p>
+			</div>
+			<div class="layui-colla-content">
+				<h2>版本：v1.170060501(已完成)</h2>
+				<p>1. 添加按钮弹窗方式修改</p>
+				<p>2. 错题管理系统多图上传开发</p>
+			</div>
+			<div class="layui-colla-content">
+				<h2>版本预估：v1.17061001(待完成)</h2>
+				<p>1 人员管理  列表追加昵称字段</p>
+				<p>2 添加人员  老师角色，去掉已经设置的老师</p>
+				<p>3 所有列表状态字段更改为滑动效果</p>
+				<p>4 基础数据-老师  增加登陆账号是否启用</p>
+				<p>5 学生管理中年级字段更改为动态设置</p>
+				<p>6 老师档案，删减字段信息包括：部门、职位、基本工资、工资系数、户口性质、紧急联系人、紧急联系人电话、紧急联系人关系</p>
+				<p>增加科目字段</p>
+				<p>7 老师新增错题：科目锁定</p>
+				<p>8 老师错题管理：搜索条件：根据学生、科目、年级</p>
+				<p>9 学校错题系统名称改为掬英培训学校</p>
+				<p>-----------------------------------------------------------------------------------------------------------------</p>
+				<p>附加：</p>
+				<p>权限设置区分菜单跟按钮中文显示</p>
+			</div>
+			<div class="layui-colla-content">
+				<h2>版本：v1.17061401(已完成)</h2>
+				<p>1 人员管理  列表追加昵称字段</p>
+				<p>2 添加人员  老师角色，去掉已经设置的老师</p>
+				<p>3 所有列表状态字段更改为滑动效果</p>
+				<p>4 基础数据-老师  增加登陆账号是否启用</p>
+				<p>5 学生管理中年级字段更改为动态设置</p>
+				<p>6 老师档案，删减字段信息包括：部门、职位、基本工资、工资系数、户口性质、紧急联系人、紧急联系人电话、紧急联系人关系</p>
+				<p>增加科目字段</p>
+				<p>7 老师新增错题：科目锁定</p>
+				<p>8 老师错题管理：搜索条件：根据学生、科目、年级</p>
+				<p>9 学校错题系统名称改为掬英培训学校</p>
+				<p>10 多图上传二次修改,更改数据库结构,编辑与查看带预览功能</p>
+				<p>11 学生错题统计系统,包括人员时间区间搜索</p>
+				<p>12 其他已知bug</p>
+				<p>-----------------------------------------------------------------------------------------------------------------</p>
+				<p>附加：</p>
+				<p>权限设置区分菜单跟按钮中文显示</p>
+			</div>
+
+
+
+		</div>
+
+	</div>
+
+</div>
+
+<script src="__Plugins__/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['layer','element'], function () {
+        var layer = layui.layer, element = layui.element();
+
+        //监听折叠
+        element.on('collapse(collapse)', function(data){
+            //layer.msg('展开状态：'+ data.show);
+        });
+
+        // you code ...
+
+
+    });
+</script>
+</body>
+</html>

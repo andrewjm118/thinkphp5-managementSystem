@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加基础数据</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">数据类型</label>
+					<div class="layui-input-inline">
+						<select name="ti_id" lay-verify="required" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="leixing" id="list"}
+							<option value="{$list.ti_id}">{$list.type_name}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">数据名称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="type_val" lay-verify="required" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button lay-submit="" style="display: none;" lay-filter="baseadd"></button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

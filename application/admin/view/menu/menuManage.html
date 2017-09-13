@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+</head>
+<body>
+<div class="admin-main">
+
+
+    <blockquote class="layui-elem-quote">
+        <a href="javascript:;" class="layui-btn layui-btn-small" id="add">
+            <i class="layui-icon">&#xe608;</i> 添加权限
+        </a>
+
+    </blockquote>
+
+
+    <div class="layui-form">
+        <table class="layui-table list-table">
+            <thead>
+            <tr>
+
+                <th>权限名称</th>
+                <th>权限规则</th>
+                <th>菜单</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="content">
+            {volist name="result" id="vo"}
+
+            <tr>
+
+                <td>{$vo._name}</td>
+                <td>{$vo.name}</td>
+                <td>
+                    {if condition="$vo.menu eq 1"}显示
+                    {else /} 隐藏
+                    {/if}
+                </td>
+                <td>
+                    {if condition="$vo.status eq 1"}启用
+                    {else /} 停用
+                    {/if}
+
+                </td>
+
+                <td>
+                    <a href="javascript:;" data-id="{$vo.id}" data-opt="addsub" class="layui-btn layui-btn-mini">添加子权限</a>
+                    <a href="javascript:;" data-id="{$vo.id}" data-opt="edit" class="layui-btn layui-btn-mini">编辑</a>
+                    <a href="javascript:;" data-id="{$vo.id}" data-opt="del" data-title="{$vo.title}" class="layui-btn layui-btn-mini">删除</a>
+                </td>
+            </tr>
+            {/volist}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+<!--模板-->
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script type="text/javascript">
+    layui.use(['layer','form'], function() {
+        var laypage = layui.laypage
+            , layer = layui.layer
+            , $ = layui.jquery
+            , layerTips = parent.layer === undefined ? layui.layer : parent.layer //获取父窗口的layer对象
+            , form = layui.form();
+
+
+        //添加菜单
+        var addBoxIndex = -1;
+        $('#add').on('click', function () {
+            if (addBoxIndex !== -1)
+                return;
+            //本表单通过ajax加载 --以模板的形式，当然你也可以直接写在页面上读取
+            $.get("{:url('addMenu')}", null, function (form) {
+                addBoxIndex = layer.open({
+                    type: 1,
+                    title: '添加角色',
+                    content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    offset: ['100px', '30%'],
+                    area: ['600px', '400px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=add-menu]').click();
+                    },
+                    full: function (elem) {
+                        var win = window.top === window.self ? window : parent.window;
+                        $(win).on('resize', function () {
+                            var $this = $(this);
+                            elem.width($this.width()).height($this.height()).css({
+                                top: 0,
+                                left: 0
+                            });
+                            elem.children('div.layui-layer-content').height($this.height() - 95);
+                        });
+                    },
+                    success: function (layero, index) {
+                        //弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        form.on('submit(add-menu)', function (data) {
+
+                            //调试表单
+                            /* layerTips.open({
+                             title: '这里面是表单的信息',
+                             type: 1,
+                             content: JSON.stringify(data.field),
+                             area: ['500px', '300px'],
+                             btn: ['关闭并刷新', '关闭'],
+                             yes: function(index, layero) {
+                             layerTips.msg('你点击了关闭并刷新');
+                             layerTips.close(index);
+                             location.reload(); //刷新
+                             }
+
+                             });*/
+                            $.ajax({
+                                type: "POST",
+                                url: "{:url('addMenu')}",
+                                data: {title: data.field.title, name: data.field.name, status: data.field.status,pid:data.field.pid},
+                                dataType: "json",
+                                success: function (data) {
+                                    if (data.code == 200) {
+                                        // layerTips.msg('添加成功');
+                                        layer.close(index);
+                                        layerTips.msg("添加成功", {icon: 1, time: 1000}, function(){
+                                            location.reload();//刷新
+                                        });
+
+                                    } else {
+                                        layerTips.msg("添加失败");
+                                    }
+
+                                }
+                            });
+                            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                        });
+                        //console.log(layero, index);
+                    },
+                    end: function () {
+                        addBoxIndex = -1;
+                    }
+                });
+            });
+        });
+
+
+        //添加子菜单
+        //绑定所有按钮事件
+        var subBoxIndex = -1;
+        var editBoxIndex = -1;
+        $('#content').children('tr').each(function() {
+            var $that = $(this);
+            $that.children('td:last-child').children('a[data-opt=addsub]').on('click', function() {
+                if(subBoxIndex !== -1)
+                    return;
+                var param = {
+                    pid: $(this).data('id')
+                };
+                var index = layer.msg('编辑载入中', {
+                    icon: 16
+                    ,shade: 0.01
+                });
+                $.get("{:url('addMenu')}", param, function (form) {
+                    layer.close(index);
+                    subBoxIndex = layer.open({
+                        type: 1,
+                        title: '添加子权限',
+                        content: form,
+                        btn: ['保存', '取消'],
+                        shade: false,
+                        offset: ['100px', '30%'],
+                        area: ['600px', '400px'],
+                        zIndex: 10000,
+                        maxmin: true,
+                        yes: function (index) {
+                            //触发表单的提交事件
+                            $('form.layui-form').find('button[lay-filter=add-menu]').click();
+                        },
+                        full: function (elem) {
+                            var win = window.top === window.self ? window : parent.window;
+                            $(win).on('resize', function () {
+                                var $this = $(this);
+                                elem.width($this.width()).height($this.height()).css({
+                                    top: 0,
+                                    left: 0
+                                });
+                                elem.children('div.layui-layer-content').height($this.height() - 95);
+                            });
+                        },
+                        success: function (layero, index) {
+                            //弹出窗口成功后渲染表单
+                            var form = layui.form();
+                            form.render();
+                            form.on('submit(add-menu)', function (data) {
+
+                                //调试表单
+                                /* layerTips.open({
+                                 title: '这里面是表单的信息',
+                                 type: 1,
+                                 content: JSON.stringify(data.field),
+                                 area: ['500px', '300px'],
+                                 btn: ['关闭并刷新', '关闭'],
+                                 yes: function(index, layero) {
+                                 layerTips.msg('你点击了关闭并刷新');
+                                 layerTips.close(index);
+                                 location.reload(); //刷新
+                                 }
+
+                                 });*/
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{:url('addMenu')}",
+                                    data: {title: data.field.title, name: data.field.name, status: data.field.status,pid:data.field.pid},
+                                    dataType: "json",
+                                    success: function (data) {
+                                        if (data.code == 200) {
+                                            // layerTips.msg('添加成功');
+                                            layer.close(index);
+                                            layerTips.msg("添加成功", {icon: 1, time: 1000}, function(){
+                                                location.reload();//刷新
+                                            });
+
+                                        } else {
+                                            layerTips.msg("添加失败");
+                                        }
+
+                                    }
+                                });
+                                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                            });
+                            //console.log(layero, index);
+                        },
+                        end: function () {
+                            subBoxIndex = -1;
+                        }
+                    });
+                });
+
+
+            });
+
+
+            //编辑事件
+            $that.children('td:last-child').children('a[data-opt=edit]').on('click', function() {
+                //layer.msg($(this).data('id'));
+                if(editBoxIndex !== -1)
+                    return;
+                var param = {
+                    id: $(this).data('id')
+                };
+                var index = layer.msg('编辑载入中', {
+                    icon: 16
+                    ,shade: 0.01
+                });
+                $.get("{:url('editMenu')}", param, function(form) {
+                    layer.close(index);
+                    editBoxIndex = layer.open({
+                        type: 1,
+                        title: '编辑权限',
+                        content: form,
+                        btn: ['保存', '取消'],
+                        shade: false,
+                        offset: ['100px', '30%'],
+                        area: ['600px', '400px'],
+                        zIndex: 10000,
+                        maxmin: true,
+                        yes: function(index) {
+                            //触发表单的提交事件
+                            $('form.layui-form').find('button[lay-filter=edit-menu]').click();
+                        },
+                        full: function(elem) {
+                            var win = window.top === window.self ? window : parent.window;
+                            $(win).on('resize', function() {
+                                var $this = $(this);
+                                elem.width($this.width()).height($this.height()).css({
+                                    top: 0,
+                                    left: 0
+                                });
+                                elem.children('div.layui-layer-content').height($this.height() - 95);
+                            });
+                        },
+                        success: function(layero, index) {
+                            //弹出窗口成功后渲染表单
+                            var form = layui.form();
+                            form.render();
+                            form.on('submit(edit-menu)', function(data) {
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{:url('editMenu')}",
+                                    async: false,
+                                    data: {id:data.field.id,title:data.field.title, name:data.field.name,status:data.field.status,menu:data.field.menu,pid:data.field.pid},
+                                    dataType: "json",
+                                    success: function(data){
+                                        if(data.code == 200){
+                                            // layerTips.msg('添加成功');
+                                            layer.close(index);
+                                            layerTips.msg("编辑成功", {icon: 1, time: 1000}, function(){
+                                                location.reload();//刷新
+                                            });
+
+                                        }else{
+                                            layerTips.msg("编辑失败");
+                                        }
+
+                                    }
+                                });
+                                return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+                            });
+                            //console.log(layero, index);
+                        },
+                        end: function() {
+                            editBoxIndex = -1;
+                        }
+                    });
+                });
+
+            });
+
+
+            //删除事件
+            $that.children('td:last-child').children('a[data-opt=del]').on('click', function(){
+                var id = $(this).data('id');
+                layer.confirm('确定删除【'+$(this).data('title')+'】?', function(index){
+                    loading = layer.load(2, {
+                        shade: [0.2,'#000'] //0.2透明度的白色背景
+                    });
+                    $.post('{:url("menuDel")}',{'id':id},function(data){
+                        if(data.code == 200){
+                            layer.close(loading);
+                            layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+                                location.reload();//do something
+                            });
+                        }else{
+                            layer.close(loading);
+                            layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+                        }
+                    });
+                });
+            });
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

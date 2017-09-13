@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生缴费</title>
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-input-inline">
+						<select name="paystu" lay-verify="required" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="stulist" id="list"}
+							<option value="{$list.stuname}|{$list.stuid}">{$list.stuname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">收款人</label>
+					<div class="layui-input-inline">
+						<select name="payee" lay-verify="required" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="shou" id="list"}
+							<option value="{$list.type_val}">{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">添加纪录人</label>
+					<div class="layui-input-inline">
+						<input type="text" name="payrecorder" lay-verify="title" autocomplete="off" placeholder="添加纪录人" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">金额</label>
+					<div class="layui-input-inline">
+						<input type="text" name="payamount"  placeholder="金额\元" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				</div>
+				<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">交费时间</label>
+					<div class="layui-input-inline">
+						<input type="text" name="paytime" id="paytime" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="paynote" lay-verify="content" id="LAY_demo_editor"></textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="payadds">立即提交</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

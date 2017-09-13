@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑学生</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">姓名</label>
+					<div class="layui-input-inline">
+						<input type="text" name="stuname" value="{$studetail.stuname}" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">性别</label>
+					<div class="layui-input-inline">
+						<select name="stusex" lay-filter="aihao">
+							<option value="">选择性别</option>
+							<option value="男" {if condition="$studetail.stusex eq '男'"}selected="selected"{/if}>男</option>
+							<option value="女" {if condition="$studetail.stusex eq '女'"}selected="selected"{/if}>女</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">出生日期</label>
+					<div class="layui-input-inline">
+						<input type="text" name="stubirth" value="{$studetail.stubirth}" id="stubirth" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">招生渠道</label>
+					<div class="layui-input-inline">
+						<select name="stufrom" lay-filter="aihao">
+							<option value="">招生渠道</option>
+							<option value="校口招生" {if condition="$studetail.stufrom eq '校口招生'"}selected="selected"{/if}>校口招生</option>
+							<option value="转介绍" {if condition="$studetail.stufrom eq '转介绍'"}selected="selected"{/if}>转介绍</option>
+							<option value="前台接待" {if condition="$studetail.stufrom eq '前台接待'"}selected="selected"{/if}>前台接待</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">电话</label>
+					<div class="layui-input-inline">
+						<input type="text" name="stuphone" value="{$studetail.stuphone}" lay-verify="title" autocomplete="off" placeholder="电话" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">家庭住址</label>
+					<div class="layui-input-inline">
+						<input type="text" name="stuaddress" value="{$studetail.stuaddress}" lay-verify="title" autocomplete="off" placeholder="家庭住址" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">学校</label>
+					<div class="layui-input-inline">
+						<input type="text" name="stuschool" value="{$studetail.stuschool}" lay-verify="title" autocomplete="off" placeholder="学校" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">年级</label>
+					<div class="layui-input-inline">
+						<select name="stugrade" lay-filter="aihao">
+							<option value="2013级" {if condition="$studetail.stugrade eq '2013级'"}selected="selected"{/if}>2013级</option>
+							<option value="2014级" {if condition="$studetail.stugrade eq '2014级'"}selected="selected"{/if}>2014级</option>
+							<option value="2015级" {if condition="$studetail.stugrade eq '2015级'"}selected="selected"{/if}>2015级</option>
+							<option value="2016级" {if condition="$studetail.stugrade eq '2016级'"}selected="selected"{/if}>2016级</option>
+							<option value="2017级" {if condition="$studetail.stugrade eq '2017级'"}selected="selected"{/if}>2017级</option>
+							<option value="2018级" {if condition="$studetail.stugrade eq '2018级'"}selected="selected"{/if}>2018级</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="stunote" lay-verify="content" id="LAY_demo_editor">{$studetail.stunote}</textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="stuid" value="{$studetail.stuid}">
+					<button class="layui-btn" lay-submit="" lay-filter="stuedit">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+
+<script>
+	layui.use(['form', 'layedit', 'laydate'], function() {
+		var form = layui.form(),
+			layer = layui.layer,
+			$ = layui.jquery,
+			layedit = layui.layedit,
+			laydate = layui.laydate;
+			layedit.set({
+			  uploadImage: {
+			    url: '{:url("Stu/upload")}' //接口url
+			    ,type: '' //默认post
+			  }
+			});
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+		//自定义验证规则
+		form.verify({
+			title: function(value) {
+				if(value.length < 1) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			pass: [/(.+){6,12}$/, '密码必须6到12位'],
+			content: function(value) {
+				layedit.sync(editIndex);
+			}
+		});
+
+		//监听提交
+		form.on('submit(stuedit)', function(data) {
+			// layer.alert(JSON.stringify(data.field), {
+			// 	title: '最终的提交信息'
+			// })
+			// return false;
+			var param = data.field;
+			$.ajax({
+                type: "POST",
+                url: "{:url('Stu/stuedit')}",
+                data: param,
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                	if(data.code == 200){
+					    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+                            //关闭tab窗口
+							/*var id  = parent.tab.getCurrentTabId();
+							 parent.tab.deleteTab(id);*/
+                            //关闭full窗口
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+					  }else{
+					    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+					  }
+                }
+            });
+			return false;
+		});
+	});
+</script>
+
+</html>

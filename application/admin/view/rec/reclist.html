@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上课记录</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+			<blockquote class="layui-elem-quote">
+				<a data-params='{"content": "{:url('recadd')}", "title": "添加上课信息","full":"true"}'   href="javascript:;" class="layui-btn layui-btn-small modal-iframe">
+					<i class="layui-icon">&#xe608;</i> 添加上课信息
+				</a>
+			</blockquote>
+			<form class="layui-form layui-form-pane search-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">学生</label>
+				<div class="layui-input-inline">
+					<input type="text" name="search[rstu]" value="{$search}" lay-verify="" placeholder="请输入学生搜索" autocomplete="off" class="layui-input">
+				</div>
+				<button class="layui-btn" lay-submit="" lay-filter="">搜索</button>
+			</div>
+	        <div class="layui-form-item page-size">
+	            <label class="layui-form-label total">共计 {$total} 条</label>
+			        <label class="layui-form-label">每页数据条</label>
+			        <div class="layui-input-inline">
+			           <input type="text" name="page_size" value="{$per_page}" lay-verify="number" placeholder="" autocomplete="off" class="layui-input">
+			        </div>
+	            <button class="layui-btn" lay-submit="" lay-filter="">确定</button>
+	        </div>
+	        </form>
+			<fieldset class="layui-elem-field">
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width:30px;text-align:center;"><input type="checkbox" lay-filter="checkAll" lay-skin="primary"></th>
+								<th>学生</th>
+								<th>老师</th>
+								<th>上课时间</th>
+								<th>科目</th>
+								<th>课型</th>
+								<th>课节</th>
+								<th>费用</th>
+								<th>实收</th>
+								<th>折扣</th>
+								<th>添加记录时间</th>
+								<th>记录人</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="contentid">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width:30px;text-align:center;"><input type="checkbox" name="rid[{$list.rid}]" value="{$list.rid}" lay-filter="checkOne" lay-skin="primary"></td>
+								<td>{$list.rstu}</td>
+								<td>{$list.rteacher}</td>
+								<td>{$list.lessontime}</td>
+								<td>{$list.subject}</td>
+								<td>{$list.clevel} / {$list.cname}</td>
+								<td>{$list.rclass}</td>
+								<td>{$list.cprice}</td>
+								<td>{$list.rincome}</td>
+								<td>{$list.rdiscount}</td>
+								<td>{$list.rtime}</td>
+								<td>{$list.recorder}</td>
+								<td>
+									<a data-params='{"content": "{:url('Rec/recedit','rid='.$list['rid'])}", "title": "编辑上课信息","full":"true"}'  href="javascript:;" class="layui-btn layui-btn-normal layui-btn-mini modal-iframe">编辑</a>
+									<a href="javascript:;" data-id="{$list.rid}" data-title="{$list.rstu}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+							<tr>
+								<th><button class="layui-btn layui-btn-small" lay-submit lay-filter="delete">批量删除</button></th>
+                    			<th colspan="12"><div style="float:right;" id="page"></div></th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.config({
+        base: '/static/js/',
+    }).extend({
+        modal: 'modal'
+    });
+    layui.use(['jquery','layer','form','laypage','modal'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			form = layui.form(),
+            modal = layui.modal,
+			laypage = layui.laypage,
+			layer = layui.layer;
+
+        //初始化
+        modal.init();
+        //ajax删除
+        $(document).on("click",'a[data-opt=del]',function(){
+			var rid = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Rec/recdel")}',{'rid':rid},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.href="{:url('Rec/reclist')}";//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		//全选
+		form.on('checkbox(checkAll)', function(data){
+			if(data.elem.checked){
+				$("input[type='checkbox']").prop('checked',true);
+			}else{
+				$("input[type='checkbox']").prop('checked',false);
+			}
+			form.render('checkbox');
+		});  
+
+		form.on('checkbox(checkOne)', function(data){
+			var is_check = true;
+			if(data.elem.checked){
+		  		$("input[lay-filter='checkOne']").each(function(){
+		    		if(!$(this).prop('checked')){ is_check = false; }
+		  		});
+		  		if(is_check){
+		    		$("input[lay-filter='checkAll']").prop('checked',true);
+		  		}
+			}else{
+		  		$("input[lay-filter='checkAll']").prop('checked',false);
+			} 
+			form.render('checkbox');
+		});
+
+		//监听删除提交
+		form.on('submit(delete)', function(data){
+			//判断是否有选项
+			var is_check = false;
+			$("input[lay-filter='checkOne']").each(function(){
+		  		if($(this).prop('checked')){ is_check = true; }
+			});
+			if(!is_check){
+		  		layer.msg('请选择数据', {icon: 2,anim: 6,time: 1000});
+		  		return false;
+			}
+			//确认删除
+			layer.confirm('确定批量删除?', function(index){
+				loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+			  	});
+			  	var param = data.field;
+			  	$.post('{:url("Rec/batches_delete")}',param,function(datas){
+				    if(datas.code == 200){
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 1, time: 1000}, function(){
+				        	location.href="{:url('Rec/reclist')}";//do something
+				    	});
+				    }else{
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 2,anim: 6, time: 1000});
+				    }
+			  	});
+			});
+			return false;
+		});
+		//分页
+		laypage({
+			cont: 'page'
+			,skip: true
+			,pages: <?php echo ceil($total/$per_page) ?> //总页数
+			,groups: 5 //连续显示分页数
+			,curr:"{$current_page}"//当前页
+			,first: 1 //将首页显示为数字1,。若不显示，设置false即可
+			,last: <?php echo ceil($total/$per_page) ?> //将尾页显示为总页数。若不显示，设置false即可
+			,jump: function(obj, first){ //触发分页后的回调
+				if(!first){ //一定要加此判断，否则初始时会无限刷新
+					// loading = layer.load(2, {
+					//   shade: [0.2,'#000'] //0.2透明度的白色背景
+					// });
+					var cerrs = obj.curr;
+					// location.href = 'http://'+window.location.host+'/admin/Tch/tchList_page?pageIndex='+cerrs;
+					location.href='?{$url_params}&page='+cerrs;
+
+				}
+			}
+		});
+		$('a[data-opt=recadd]').on('click', function () {
+            var url =$(this).data('url');
+            parent.tab.tabAdd({
+                href:url,
+                title:'添加上课信息'
+            });
+        });
+        $('a[data-opt=recedit]').on('click', function () {
+            var url =$(this).data('url');
+            var name =$(this).data('name');
+            parent.tab.tabAdd({
+                href:url,
+                title:'编辑'+name+'上课信息'
+            });
+        });
+    });
+
+</script>
+</html>

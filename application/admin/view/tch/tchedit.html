@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑教师</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+
+	<div style="margin: 15px;">
+
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">姓名</label>
+					<div class="layui-input-inline">
+						<input type="text" name="tname" value="{$tchdetail['tname']}" lay-verify="title" autocomplete="off" placeholder="姓名" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">性别</label>
+					<div class="layui-input-inline">
+						<select name="tsex" lay-filter="aihao">
+							<option value=""></option>
+							<option value="男" {if condition="$tchdetail.tsex eq '男'"}selected="selected"{/if}>男</option>
+							<option value="女" {if condition="$tchdetail.tsex eq '女'"}selected="selected"{/if}>女</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">出生日期</label>
+					<div class="layui-input-inline">
+						<input type="text" name="tbirth" value="{$tchdetail['tbirth']}" id="tbirth" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">民族</label>
+					<div class="layui-input-inline">
+						<select name="tnation" lay-filter="aihao">
+							<option value=""></option>
+							<option value="汉族" {if condition="$tchdetail.tnation eq '汉族'"}selected="selected"{/if}>汉族</option>
+							<option value="其他" {if condition="$tchdetail.tnation eq '其他'"}selected="selected"{/if}>其他</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">电话</label>
+					<div class="layui-input-inline">
+						<input type="text" name="tphone" value="{$tchdetail['tphone']}" lay-verify="title" autocomplete="off" placeholder="电话" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">身份证号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="tidcard" value="{$tchdetail['tidcard']}" lay-verify="identity" placeholder="" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">科目</label>
+					<div class="layui-input-inline">
+						<select name="kemu" lay-verify="required">
+							<option value=""></option>
+							{volist name="kemu" id="list"}
+							<option value="{$list.type_val}" {if condition="$tchdetail.kemu eq $list.type_val"}selected="selected"{/if}>{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+
+
+				<div class="layui-inline">
+					<label class="layui-form-label">学历</label>
+					<div class="layui-input-inline">
+						<select name="teducation" lay-filter="aihao">
+							<option value=""></option>
+							<option value="专科" {if condition="$tchdetail.teducation eq '专科'"}selected="selected"{/if}>专科</option>
+							<option value="本科" {if condition="$tchdetail.teducation eq '本科'"}selected="selected"{/if}>本科</option>
+							<option value="硕士" {if condition="$tchdetail.teducation eq '硕士'"}selected="selected"{/if}>硕士</option>
+							<option value="博士" {if condition="$tchdetail.teducation eq '博士'"}selected="selected"{/if}>博士</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">入职时间</label>
+					<div class="layui-input-inline">
+						<input type="text" name="entrytime" value="{$tchdetail['entrytime']}" id="entrytime" lay-verify="date" placeholder="yyyy-mm-dd" autocomplete="off" class="layui-input" onclick="layui.laydate({elem: this})">
+					</div>
+				</div>
+			<!--	<div class="layui-inline">
+					<label class="layui-form-label">部门</label>
+					<div class="layui-input-inline">
+						<select name="tdepartment" lay-filter="aihao">
+							<option value=""></option>
+							<option value="部门1" {if condition="$tchdetail.tdepartment eq '部门1'"}selected="selected"{/if}>部门1</option>
+							<option value="部门2" {if condition="$tchdetail.tdepartment eq '部门2'"}selected="selected"{/if}>部门2</option>
+							<option value="部门3" {if condition="$tchdetail.tdepartment eq '部门3'"}selected="selected"{/if}>部门3</option>
+						</select>
+					</div>
+				</div>-->
+			<!--	<div class="layui-inline">
+					<label class="layui-form-label">职位</label>
+					<div class="layui-input-inline">
+						<select name="position" lay-filter="aihao">
+							<option value=""></option>
+							<option value="职位1" {if condition="$tchdetail.position eq '职位1'"}selected="selected"{/if}>职位1</option>
+							<option value="职位2" {if condition="$tchdetail.position eq '职位2'"}selected="selected"{/if}>职位2</option>
+							<option value="职位3" {if condition="$tchdetail.position eq '职位3'"}selected="selected"{/if}>职位3</option>
+							<option value="职位4" {if condition="$tchdetail.position eq '职位4'"}selected="selected"{/if}>职位4</option>
+						</select>
+					</div>
+				</div>-->
+				<div class="layui-inline">
+					<label class="layui-form-label">状态</label>
+					<div class="layui-input-inline">
+						<select name="tstate" lay-filter="aihao">
+							<option value=""></option>
+							<option value="实习" {if condition="$tchdetail.tstate eq '实习'"}selected="selected"{/if}>实习</option>
+							<option value="正式" {if condition="$tchdetail.tstate eq '正式'"}selected="selected"{/if}>正式</option>
+							<option value="离职" {if condition="$tchdetail.tstate eq '离职'"}selected="selected"{/if}>离职</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">毕业院校</label>
+					<div class="layui-input-inline">
+						<input type="text" name="college" value="{$tchdetail['college']}" lay-verify="title" autocomplete="off" placeholder="毕业院校" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">专业</label>
+					<div class="layui-input-inline">
+						<input type="text" name="major" value="{$tchdetail['major']}" lay-verify="title" autocomplete="off" placeholder="专业" class="layui-input">
+					</div>
+				</div>
+			</div>	
+
+			<div class="layui-form-item">
+
+				<!--<div class="layui-inline">
+					<label class="layui-form-label">基本工资</label>
+					<div class="layui-input-inline">
+						<input type="text" name="salary" value="{$tchdetail['salary']}" lay-verify="salary" autocomplete="off" placeholder="基本工资" class="layui-input">
+					</div>
+				</div>-->
+			<!--	<div class="layui-inline">
+					<label class="layui-form-label">工资系数</label>
+					<div class="layui-input-inline">
+						<input type="text" name="ratio" value="{$tchdetail['ratio']}" lay-verify="title" autocomplete="off" placeholder="工资系数" class="layui-input">
+					</div>
+				</div>-->
+
+			</div>		
+			
+			<div class="layui-form-item">
+				<!--<div class="layui-inline">
+					<label class="layui-form-label">户口性质</label>
+					<div class="layui-input-inline">
+						<select name="residence" lay-filter="aihao">
+							<option value=""></option>
+							<option value="性质1" {if condition="$tchdetail.residence eq '性质1'"}selected="selected"{/if}>性质1</option>
+							<option value="性质2" {if condition="$tchdetail.residence eq '性质2'"}selected="selected"{/if}>性质2</option>
+						</select>
+					</div>
+				</div>-->
+			<!--	<div class="layui-inline">
+					<label class="layui-form-label">紧急联系人</label>
+					<div class="layui-input-inline">
+						<input type="text" name="contact" value="{$tchdetail['contact']}" lay-verify="title" autocomplete="off" placeholder="紧急联系人" class="layui-input">
+					</div>
+				</div>-->
+				<!--<div class="layui-inline">
+					<label class="layui-form-label">紧急联系人电话</label>
+					<div class="layui-input-inline">
+						<input type="text" name="cphone" value="{$tchdetail['cphone']}" lay-verify="title" autocomplete="off" placeholder="紧急联系人电话" class="layui-input">
+					</div>
+				</div>-->
+				<!--<div class="layui-inline">
+					<label class="layui-form-label">紧急联系人关系</label>
+					<div class="layui-input-inline">
+						<select name="crelation" lay-filter="aihao">
+							<option value=""></option>
+							<option value="父亲" {if condition="$tchdetail.crelation eq '父亲'"}selected="selected"{/if}>父亲</option>
+							<option value="母亲" {if condition="$tchdetail.crelation eq '母亲'"}selected="selected"{/if}>母亲</option>
+							<option value="其他亲属" {if condition="$tchdetail.crelation eq '其他亲属'"}selected="selected"{/if}>其他亲属</option>
+						</select>
+					</div>
+				</div>-->
+
+					<label class="layui-form-label">现住址</label>
+					<div class="layui-input-block" style="width:56%">
+						<input type="text" name="taddress" value="{$tchdetail['taddress']}" lay-verify="title" autocomplete="off" placeholder="家庭住址" class="layui-input">
+					</div>
+
+			</div>	
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="tnote" lay-verify="content" id="LAY_demo_editor">{$tchdetail['tnote']}</textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="tid" value="{$tchdetail['tid']}">
+					<button class="layui-btn" lay-submit="" lay-filter="teacher_edit">立即提交</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+
+<script>
+	layui.use(['form', 'layedit', 'laydate','layer'], function() {
+		var form = layui.form(),
+			layer = layui.layer,
+			$ = layui.jquery,
+			layedit = layui.layedit,
+			laydate = layui.laydate;
+			layedit.set({
+			  uploadImage: {
+			    url: '{:url("Tch/upload")}' //接口url
+			    ,type: '' //默认post
+			  }
+			});
+		//创建一个编辑器
+		var editIndex = layedit.build('LAY_demo_editor');
+		//自定义验证规则
+		form.verify({
+			title: function(value) {
+				if(value.length < 1) {
+					return '标题至少得5个字符啊';
+				}
+			},
+			pass: [/(.+){6,12}$/, '密码必须6到12位'],
+			content: function(value) {
+				layedit.sync(editIndex);
+			}
+		});
+
+		//监听提交
+		form.on('submit(teacher_edit)', function(data) {
+			loading = layer.load(2, {
+		      shade: [0.2,'#000'] //0.2透明度的白色背景
+		    });
+			var param = data.field;
+			$.ajax({
+                type: "POST",
+                url: "{:url('Tch/tchedit')}",
+                data: param,
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                	if(data.code == 200){
+                		layer.close(loading);
+					    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+                            //关闭tab窗口
+							/*var id  = parent.tab.getCurrentTabId();
+							 parent.tab.deleteTab(id);*/
+                            //关闭full窗口
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
+                        });
+					  }else{
+					  	layer.close(loading);
+					    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+					  }
+                }
+            });
+			return false;
+		});
+	});
+</script>
+
+</html>

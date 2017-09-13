@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加人员</title>	
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+			<input style="display:none" type="text" name="aaaaaa"/>
+			<input style="display:none" type="password" name="bbbbbbbbbb"/>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">角色</label>
+					<div class="layui-input-inline">
+						<select name="rule_id" lay-verify="required" lay-filter="rule_id">
+							<option value=""></option>
+							{volist name="authlist" id="list"}
+							<option value="{$list.id}|{$list.title}">{$list.title}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div id="nis" class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">昵称</label>
+					<div class="layui-input-inline">
+						<input type="text" name="nick" id="nick" placeholder="昵称" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div id="tea" class="layui-form-item" style="display: none;">
+				<div class="layui-inline">
+					<label class="layui-form-label">老师</label>
+					<div class="layui-input-inline">
+						<select name="teacher_id" lay-filter="teacher_id">
+							<option value=""></option>
+							{volist name="tchlist" id="list"}
+							<option value="{$list.tid}|{$list.tname}">{$list.tname}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div id="stus" class="layui-form-item" style="display: none;">
+				<div class="layui-inline">
+					<label class="layui-form-label">学生</label>
+					<div class="layui-inline">
+						{volist name="stulist" id="list" mod="5"}
+							<input type="checkbox" name="stus[{$list.stuid}]" value="{$list.stuid}" title="{$list.stuname}" lay-skin="primary" lay-filter="stux">
+							{eq name="mod" value="4"}<br/>{/eq}
+						{/volist}
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">登陆账号</label>
+					<div class="layui-input-inline">
+						<input type="text" name="mobile" id="mobile" lay-verify="phone"  placeholder="手机号" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="pass" lay-verify="password" autocomplete="off" placeholder="密码" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">确认密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="repass" lay-verify="password" autocomplete="off" placeholder="确认密码" class="layui-input">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+		            <label class="layui-form-label">状态</label>
+		            <div class="layui-input-block">
+		                <input type="checkbox" name="lock" checked lay-skin="switch">
+		            </div>
+		        </div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="useradds">立即提交</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

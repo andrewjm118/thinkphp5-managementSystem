@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <style>
+        .duanxin{
+            width:60%;
+            margin-top:20px;
+            margin-left:20px;
+        }
+        .duanxin .layui-textarea{
+            width:40%;
+        }
+    </style>
+</head>
+
+<body>
+
+
+<fieldset class="layui-elem-field duanxin">
+    <legend>发送短信</legend>
+    <div class="layui-field-box">
+        <form class="layui-form" action="">
+
+            <div class="layui-form-item layui-form-text" id="dianhua">
+                <label class="layui-form-label">电话列表</label>
+                <div class="layui-input-block">
+                    <textarea name="desc" placeholder="请输入内容" class="layui-textarea" v-model="message" id="area"></textarea>
+                    <div class="layui-form-mid layui-word-aux">{{message}}</div>
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit lay-filter="formDemo">发送短信</button>
+                    <button class="layui-btn" onClick="checklines()">获取手机数量</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+
+
+
+<script src="__Plugins__/layui/layui.js"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form();
+
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            layer.msg(JSON.stringify(data.field));
+            return false;
+        });
+
+
+    });
+    function checklines()
+    {
+        var obj1 = document.getElementById("dianhua");
+        var o1=obj1.createTextRange().getClientRects();
+        var lines1 = o1.length;
+        if(lines1>=2)
+        {
+            alert('投诉内容已输入'+lines1+'行,输入最大行数应为1行！');
+            return;
+        }
+
+    }
+</script>
+
+</body>
+
+</html>
+

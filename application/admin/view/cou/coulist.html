@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>课程列表</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+			<blockquote class="layui-elem-quote">
+				<a href="javascript:;" data-opt="couadd" class="layui-btn layui-btn-small">
+					<i class="layui-icon">&#xe608;</i> 添加课程
+				</a>
+			</blockquote>
+			<form class="layui-form layui-form-pane search-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">课程类型</label>
+				<div class="layui-input-inline">
+					<input type="text" name="search[subject]" value="{$search}" lay-verify="" placeholder="请输入课程类型搜索" autocomplete="off" class="layui-input">
+				</div>
+				<button class="layui-btn" lay-submit="" lay-filter="">搜索</button>
+			</div>
+	        <div class="layui-form-item page-size">
+	            <label class="layui-form-label total">共计 {$total} 条</label>
+			        <label class="layui-form-label">每页数据条</label>
+			        <div class="layui-input-inline">
+			           <input type="text" name="page_size" value="{$per_page}" lay-verify="number" placeholder="" autocomplete="off" class="layui-input">
+			        </div>
+	            <button class="layui-btn" lay-submit="" lay-filter="">确定</button>
+	        </div>
+	        </form>
+			<fieldset class="layui-elem-field">
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width:30px;text-align:center;"><input type="checkbox" lay-filter="checkAll" lay-skin="primary"></th>
+								<th>科目</th>
+								<th>课程类型</th>
+								<th>年级</th>
+								<th>价钱</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="contentid">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width:30px;text-align:center;"><input type="checkbox" name="cid[{$list.cid}]" value="{$list.cid}" lay-filter="checkOne" lay-skin="primary"></td>
+								<td>{$list.subject}</td>
+								<td>{$list.cname}</td>
+								<td>{$list.clevel}</td>
+								<td>{$list.cprice}</td>
+								<td>
+									<a href="javascript:;" data-opt="couedit" data-id="{$list.cid}" class="layui-btn layui-btn-normal layui-btn-mini">查看</a>
+									<a href="javascript:;" data-id="{$list.cid}" data-title="{$list.cname}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+							<tr>
+								<th><button class="layui-btn layui-btn-small" lay-submit lay-filter="delete">批量删除</button></th>
+                    			<th colspan="6"><div style="float:right;" id="page"></div></th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.use(['jquery','layer','form','laypage', 'layedit'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			form = layui.form(),
+			laypage = layui.laypage,
+			layer = layui.layer;
+   
+        //ajax删除
+        $(document).on("click",'a[data-opt=del]',function(){
+			var cid = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Cou/coudel")}',{'cid':cid},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.href="{:url('Cou/coulist')}";//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		//全选
+		form.on('checkbox(checkAll)', function(data){
+			if(data.elem.checked){
+				$("input[type='checkbox']").prop('checked',true);
+			}else{
+				$("input[type='checkbox']").prop('checked',false);
+			}
+			form.render('checkbox');
+		});  
+
+		form.on('checkbox(checkOne)', function(data){
+			var is_check = true;
+			if(data.elem.checked){
+		  		$("input[lay-filter='checkOne']").each(function(){
+		    		if(!$(this).prop('checked')){ is_check = false; }
+		  		});
+		  		if(is_check){
+		    		$("input[lay-filter='checkAll']").prop('checked',true);
+		  		}
+			}else{
+		  		$("input[lay-filter='checkAll']").prop('checked',false);
+			} 
+			form.render('checkbox');
+		});
+
+		//监听删除提交
+		form.on('submit(delete)', function(data){
+			//判断是否有选项
+			var is_check = false;
+			$("input[lay-filter='checkOne']").each(function(){
+		  		if($(this).prop('checked')){ is_check = true; }
+			});
+			if(!is_check){
+		  		layer.msg('请选择数据', {icon: 2,anim: 6,time: 1000});
+		  		return false;
+			}
+			//确认删除
+			layer.confirm('确定批量删除?', function(index){
+				loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+			  	});
+			  	var param = data.field;
+			  	$.post('{:url("Cou/batches_delete")}',param,function(datas){
+				    if(datas.code == 200){
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 1, time: 1000}, function(){
+				        	location.href="{:url('Cou/coulist')}";//do something
+				    	});
+				    }else{
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 2,anim: 6, time: 1000});
+				    }
+			  	});
+			});
+			return false;
+		});
+		//分页
+		laypage({
+			cont: 'page'
+			,skip: true
+			,pages: <?php echo ceil($total/$per_page) ?> //总页数
+			,groups: 5 //连续显示分页数
+			,curr:"{$current_page}"//当前页
+			,first: 1 //将首页显示为数字1,。若不显示，设置false即可
+			,last: <?php echo ceil($total/$per_page) ?> //将尾页显示为总页数。若不显示，设置false即ss可
+			,jump: function(obj, first){ //触发分页后的回调
+				if(!first){ //一定要加此判断，否则初始时会无限刷新
+					// loading = layer.load(2, {
+					//   shade: [0.2,'#000'] //0.2透明度的白色背景
+					// });
+					var cerrs = obj.curr;
+					// location.href = 'http://'+window.location.host+'/admin/Tch/tchList_page?pageIndex='+cerrs;
+					location.href='?{$url_params}&page='+cerrs;
+
+				}
+			}
+		});
+		$(document).on("click",'a[data-opt=couedit]',function(){
+        	var param = {
+                cid: $(this).data('id')
+            };
+            var index = layer.msg('编辑载入中', {
+                icon: 16
+                ,shade: 0.01
+            });
+			$.get("{:url('couedit')}", param, function(form){
+				layer.close(index);
+				layer.open({
+					type: 1,
+					title: '编辑课程',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['1200px', '600px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=couedits]').click();
+                        // layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(couedits)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('Cou/couedit')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('Cou/coulist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+						//创建一个编辑器
+						var editIndex = layedit.build('LAY_demo_editor');
+						//自定义验证规则
+						form.verify({
+							title: function(value) {
+								if(value.length < 1) {
+									return '标题至少得5个字符啊';
+								}
+							},
+							pass: [/(.+){6,12}$/, '密码必须6到12位'],
+							content: function(value) {
+								layedit.sync(editIndex);
+							}
+						});
+					},
+				});
+			});
+		});
+        $(document).on("click",'a[data-opt=couadd]',function(){
+            var index = layer.msg('添加载入中', {
+                icon: 16
+                ,shade: 0.01
+            });
+			$.get("{:url('couadd')}", {}, function(form){
+				layer.close(index);
+				layer.open({
+					type: 1,
+					title: '添加课程',
+					content: form,
+                    btn: ['保存', '取消'],
+                    shade: false,
+                    area: ['1200px', '600px'],
+                    zIndex: 10000,
+                    maxmin: true,
+                    yes: function (index) {
+                        //触发表单的提交事件
+                        $('form.layui-form').find('button[lay-filter=couadds]').click();
+                        // layer.close(index); //如果设定了yes回调，需进行手工关闭
+                    },
+					success: function(layero, index){
+						//弹出窗口成功后渲染表单
+                        var form = layui.form();
+                        form.render();
+                        //监听提交
+						form.on('submit(couadds)', function(data) {
+							var param = data.field;
+							$.ajax({
+				                type: "POST",
+				                url: "{:url('Cou/couadd')}",
+				                data: param,
+				                dataType: 'json',
+				                async: false,
+				                cache: false,
+				                success: function (data) {
+				                	if(data.code == 200){
+									    layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+									      location.href = "{:url('Cou/coulist')}";//do something
+									    });
+									  }else{
+									    layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+									  }
+				                }
+				            });
+							return false;
+						});
+						//创建一个编辑器
+						var editIndex = layedit.build('LAY_demo_editor');
+						//自定义验证规则
+						form.verify({
+							title: function(value) {
+								if(value.length < 1) {
+									return '标题至少得5个字符啊';
+								}
+							},
+							pass: [/(.+){6,12}$/, '密码必须6到12位'],
+							content: function(value) {
+								layedit.sync(editIndex);
+							}
+						});
+					},
+				});
+			});
+		});
+    });
+
+</script>
+</html>

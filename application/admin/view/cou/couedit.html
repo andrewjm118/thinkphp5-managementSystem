@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑课程</title>	
+</head>
+<body>
+
+	<div style="margin: 15px;">
+		<form class="layui-form" action="">
+		
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">科目</label>
+					<div class="layui-input-inline">
+						<select name="subject" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="kemu" id="list"}
+							<option value="{$list.type_val}" {if condition="$paydetail.subject eq $list.type_val"}selected="selected"{/if}>{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">课程类型</label>
+					<div class="layui-input-inline">
+						<select name="cname" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="kelei" id="list"}
+							<option value="{$list.type_val}" {if condition="$paydetail.cname eq $list.type_val"}selected="selected"{/if}>{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				</div>
+				<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">年级</label>
+					<div class="layui-input-inline">
+						<select name="clevel" lay-filter="aihao">
+							<option value=""></option>
+							{volist name="grade" id="list"}
+							<option value="{$list.type_val}" {if condition="$paydetail.clevel eq $list.type_val"}selected="selected"{/if}>{$list.type_val}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				
+				<div class="layui-inline">
+					<label class="layui-form-label">价钱</label>
+					<div class="layui-input-inline">
+						<input type="text" name="cprice" value="{$paydetail.cprice}"  placeholder="价钱\元" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+			
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label">备注</label>
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="cnote" lay-verify="content" id="LAY_demo_editor">{$paydetail.cnote}</textarea>
+				</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="hidden" name="cid" value="{$paydetail.cid}">
+					<button class="layui-btn" lay-submit style="display: none;" lay-filter="couedits">立即提交</button>
+				</div>
+			</div>
+			
+		</form>
+	</div>
+		
+</body>
+</html>

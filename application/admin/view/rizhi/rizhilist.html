@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>日志列表</title>
+    <link rel="stylesheet" href="__Plugins__/layui/css/layui.css">
+    <link rel="stylesheet" href="__CSS__/global.css" media="all">
+    <link rel="stylesheet" href="__Plugins__/font-awesome/css/font-awesome.min.css">	
+</head>
+<body>
+		<div class="admin-main">
+			<form class="layui-form layui-form-pane search-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label">权限</label>
+				<div class="layui-input-inline">
+					<input type="text" name="search[login_auth]" value="{$search}" lay-verify="" placeholder="请输入权限搜索" autocomplete="off" class="layui-input">
+				</div>
+				<button class="layui-btn" lay-submit="" lay-filter="">搜索</button>
+			</div>
+	        <div class="layui-form-item page-size">
+	            <label class="layui-form-label total">共计 {$total} 条</label>
+			        <label class="layui-form-label">每页数据条</label>
+			        <div class="layui-input-inline">
+			           <input type="text" name="page_size" value="{$per_page}" lay-verify="number" placeholder="" autocomplete="off" class="layui-input">
+			        </div>
+	            <button class="layui-btn" lay-submit="" lay-filter="">确定</button>
+	        </div>
+	        </form>
+			<fieldset class="layui-elem-field">
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table">
+						<thead>
+							<tr>
+								<th style="width:30px;text-align:center;"><input type="checkbox" lay-filter="checkAll" lay-skin="primary"></th>
+								<th>ID</th>
+								<th>登录人员</th>
+								<th>登陆时间</th>
+								<th>登陆IP</th>
+								<th>权限</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="result" id="list"}
+							<tr>
+								<td style="width:30px;text-align:center;"><input type="checkbox" name="id[{$list.id}]" value="{$list.id}" lay-filter="checkOne" lay-skin="primary"></td>
+								<td>{$list.id}</td>
+								<td>{$list.login_people}</td>
+								<td>{$list.login_time|time_format}</td>
+								<td>{$list.login_ip|long2ip}</td>
+								<td>{$list.login_auth}</td>
+								<td>
+									<a href="javascript:;" data-id="{$list.id}" data-title="{$list.login_people}" data-opt="del" class="layui-btn layui-btn-danger layui-btn-mini">删除</a>
+								</td>
+							</tr>
+							{/volist}
+							<tr>
+								<th><button class="layui-btn layui-btn-small" lay-submit lay-filter="delete">批量删除</button></th>
+                    			<th colspan="6"><div style="float:right;" id="page"></div></th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</div>
+</body>
+<script type="text/javascript" src="__Plugins__/layui/layui.js"></script>
+<script>
+    layui.use(['jquery','layer','laypage','form'], function() {
+        var $ = layui.jquery,
+        	layedit = layui.layedit,
+			laydate = layui.laydate,
+			form = layui.form(),
+			$form = $('form'),
+			layer = layui.layer,
+			laypage = layui.laypage;
+        //ajax删除
+		$('a[data-opt=del]').click(function(){
+			var id = $(this).data('id');
+			var name = $(this).data('title');
+			layer.confirm('确定删除【'+name+'】?', function(index){
+			  	loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+				});
+				$.post('{:url("Rizhi/rizhidel")}',{'id':id},function(data){
+				    if(data.code == 200){
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 1, time: 1000}, function(){
+				        location.href="{:url('Rizhi/rizhilist')}";//do something
+				      });
+				    }else{
+				      layer.close(loading);
+				      layer.msg(data.msg, {icon: 2, anim: 6, time: 1000});
+				    }
+				});
+			});
+		});
+		//全选
+		form.on('checkbox(checkAll)', function(data){
+			if(data.elem.checked){
+				$("input[type='checkbox']").prop('checked',true);
+			}else{
+				$("input[type='checkbox']").prop('checked',false);
+			}
+			form.render('checkbox');
+		});  
+
+		form.on('checkbox(checkOne)', function(data){
+			var is_check = true;
+			if(data.elem.checked){
+		  		$("input[lay-filter='checkOne']").each(function(){
+		    		if(!$(this).prop('checked')){ is_check = false; }
+		  		});
+		  		if(is_check){
+		    		$("input[lay-filter='checkAll']").prop('checked',true);
+		  		}
+			}else{
+		  		$("input[lay-filter='checkAll']").prop('checked',false);
+			} 
+			form.render('checkbox');
+		});
+
+		//监听删除提交
+		form.on('submit(delete)', function(data){
+			//判断是否有选项
+			var is_check = false;
+			$("input[lay-filter='checkOne']").each(function(){
+		  		if($(this).prop('checked')){ is_check = true; }
+			});
+			if(!is_check){
+		  		layer.msg('请选择数据', {icon: 2,anim: 6,time: 1000});
+		  		return false;
+			}
+			//确认删除
+			layer.confirm('确定批量删除?', function(index){
+				loading = layer.load(2, {
+			    	shade: [0.2,'#000'] //0.2透明度的白色背景
+			  	});
+			  	var param = data.field;
+			  	$.post('{:url("Rizhi/batches_delete")}',param,function(datas){
+				    if(datas.code == 200){
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 1, time: 1000}, function(){
+				        	location.href="{:url('Rizhi/rizhilist')}";//do something
+				    	});
+				    }else{
+				    	layer.close(loading);
+				    	layer.msg(datas.msg, {icon: 2,anim: 6, time: 1000});
+				    }
+			  	});
+			});
+			return false;
+		});
+		//分页
+		laypage({
+			cont: 'page'
+			,skip: true
+			,pages: <?php echo ceil($total/$per_page) ?> //总页数
+			,groups: 5 //连续显示分页数
+			,curr:"{$current_page}"//当前页
+			,first: 1 //将首页显示为数字1,。若不显示，设置false即可
+			,last: <?php echo ceil($total/$per_page) ?> //将尾页显示为总页数。若不显示，设置false即可
+			,jump: function(obj, first){ //触发分页后的回调
+				if(!first){ //一定要加此判断，否则初始时会无限刷新
+					// loading = layer.load(2, {
+					//   shade: [0.2,'#000'] //0.2透明度的白色背景
+					// });
+					var cerrs = obj.curr;
+					// location.href = 'http://'+window.location.host+'/admin/Tch/tchList_page?pageIndex='+cerrs;
+					location.href='?{$url_params}&page='+cerrs;
+
+				}
+			}
+		});
+    });
+
+</script>
+</html>
